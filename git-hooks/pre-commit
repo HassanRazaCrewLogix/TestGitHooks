@@ -1,0 +1,24 @@
+#!/bin/bash
+
+root="$(git rev-parse --show-toplevel)"
+[ -d "$root" ] || exit 1
+
+owndir="$(cd "$(dirname "$0")"; pwd -P)"
+
+OS_NAME=$(uname)
+
+if [ "$OS_NAME" = "Darwin" ]; then
+  FIND_ARGS="-perm +0111"
+else
+  FIND_ARGS="-executable"
+fi
+tmp_file="$root/.git/tmp-filelist.txt"
+git diff --name-only --cached --diff-filter=ACM | awk -v prefix="$root/" '{print prefix $0}' > "$tmp_file"
+
+echo "Processing import-optimizer script ..."
+"$owndir/import-optimizer" < "$tmp_file" || exit 1
+
+echo "Processing formatter script ..."
+"$owndir/formatter" < "$tmp_file" || exit 1
+cat $tmp_file | xargs git add
+rm "$tmp_file"
