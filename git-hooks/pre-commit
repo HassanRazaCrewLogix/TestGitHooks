@@ -1,20 +1,24 @@
-#!/bin/bash
-# Check if this is the initial commit
-if git rev-parse --verify HEAD >/dev/null 2>&1
-then
-echo "pre-commit: About to create a new commit..."
-against=HEAD
-else
-echo "pre-commit: About to create the first commit..."
-against=4b825dc642cb6eb9a060e54bf8d69288fbee4904
-fi
-# Use git diff-index to check for whitespace errors
-echo "pre-commit: Testing for whitespace errors..."
-if ! git diff-index --check --cached $against
-then
-echo "pre-commit: Aborting commit due to whitespace errors"
-exit 1
-else
-echo "pre-commit: No whitespace errors :)"
-exit 0
-fi
+#!/bin/sh
+# this hook is in SCM so that it can be shared
+# to install it, create a symbolic link in the projects .git/hooks folder
+#
+#       i.e. - from the .git/hooks directory, run
+#               $ ln -s ../../git-hooks/pre-commit.sh pre-commit
+#
+# to skip the tests, run with the --no-verify argument
+#       i.e. - $ 'git commit --no-verify'
+
+# stash any unstaged changes
+git stash -q --keep-index
+
+# run the tests with the gradle wrapper
+./gradlew test
+
+# store the last exit code in a variable
+RESULT=$?
+
+# unstash the unstashed changes
+git stash pop -q
+
+# return the './gradlew test' exit code
+exit $RESULT
