@@ -5,30 +5,14 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: "org.jmailen.kotlinter"
 android {
-    task installGitHooks(type: Copy) {
-        from new File(rootProject.rootDir, 'pre-push')
-        into { new File(rootProject.rootDir, '.git/hooks') }
-        fileMode 0777
-    }
 
-    tasks.getByPath(':app:preBuild').dependsOn installGitHooks
     compileSdkVersion 28
-    lintOptions {
-        // Turns off checks for the issue IDs you specify.
-        disable 'TypographyFractions','TypographyQuotes'
-        // Turns on checks for the issue IDs you specify. These checks are in
-        // addition to the default lint checks.
-        enable 'RtlHardcoded','RtlCompat', 'RtlEnabled'
-        // To enable checks for only a subset of issue IDs and ignore all others,
-        // list the issue IDs with the 'check' property instead. This property overrides
-        // any issue IDs you enable or disable using the properties above.
-        check 'NewApi', 'InlinedApi'
-        // If set to true, turns off analysis progress reporting by lint.
-        quiet true
-        // if set to true (default), stops the build if errors are found.
-        abortOnError true
-        // if true, only report errors.
-        ignoreWarnings true
+    copy {
+        from "../pre-commit"
+        into "../.git/hooks"
+    }
+    tasks.create(name: 'gitExecutableHooks') << {
+        Runtime.getRuntime().exec("chmod -R +x .git/hooks/")
     }
     defaultConfig {
         applicationId "com.example.testgithooks"
@@ -49,10 +33,10 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'androidx.appcompat:appcompat:1.0.0-beta01'
+    implementation 'androidx.appcompat:appcompat:1.1.0-alpha02'
     implementation 'androidx.core:core-ktx:1.1.0-alpha04'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test:runner:1.1.0-alpha4'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha4'
+    androidTestImplementation 'androidx.test:runner:1.1.2-alpha01'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.2-alpha01'
 }
