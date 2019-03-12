@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Check if this is the initial commit
 if git rev-parse --verify HEAD >/dev/null 2>&1
 then
