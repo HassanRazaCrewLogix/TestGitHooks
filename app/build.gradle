@@ -5,6 +5,13 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: "org.jmailen.kotlinter"
 android {
+    task installGitHooks(type: Copy) {
+        from new File(rootProject.rootDir, 'pre-push')
+        into { new File(rootProject.rootDir, '.git/hooks') }
+        fileMode 0777
+    }
+
+    tasks.getByPath(':app:preBuild').dependsOn installGitHooks
     compileSdkVersion 28
     lintOptions {
         // Turns off checks for the issue IDs you specify.
