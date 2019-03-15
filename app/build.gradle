@@ -4,6 +4,7 @@ apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
 apply plugin: "org.jmailen.kotlinter"
+apply from: rootProject.file('gradle/install-git-hooks.gradle')
 android {
 
     compileSdkVersion 28
